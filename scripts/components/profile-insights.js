@@ -1,4 +1,5 @@
 import { employees, currentUserId } from "../data/employees.js";
+import { COMPONENT_TAGS } from "../config/component-tags.js";
 
 const payrollHistory = [
   { month: "Feb", hours: 160, salary: 11800000 },
@@ -56,4 +57,4 @@ class ProfileInsights extends HTMLElement {
   }
 }
 
-customElements.define("profile-insights", ProfileInsights);
+customElements.define(COMPONENT_TAGS.PROFILE_INSIGHTS, ProfileInsights);

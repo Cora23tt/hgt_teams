@@ -1,4 +1,6 @@
 import { employees } from "../data/employees.js";
+import { COMPONENT_TAGS } from "../config/component-tags.js";
+import { resolveEmployeeStatus } from "../config/employee.js";
 
 class DirectoryView extends HTMLElement {
   constructor() {
@@ -48,7 +50,9 @@ class DirectoryView extends HTMLElement {
 
     list.innerHTML = this.filtered
       .map(
-        (employee) => `
+        (employee) => {
+          const statusMeta = resolveEmployeeStatus(employee.status);
+          return `
           <article class="card">
             <header>
               <div>
@@ -56,8 +60,8 @@ class DirectoryView extends HTMLElement {
                 <h3>${employee.name}</h3>
                 <p>${employee.role}</p>
               </div>
-              <span class="status ${employee.status.toLowerCase().replace(/\s/g, "-")}" aria-label="${employee.status}">
-                ${employee.status}
+              <span class="status ${statusMeta.id}" aria-label="${statusMeta.label}">
+                ${statusMeta.label}
               </span>
             </header>
             <dl>
@@ -75,10 +79,11 @@ class DirectoryView extends HTMLElement {
               </div>
             </dl>
           </article>
-        `
+        `;
+        }
       )
       .join("");
   }
 }
 
-customElements.define("directory-view", DirectoryView);
+customElements.define(COMPONENT_TAGS.DIRECTORY_VIEW, DirectoryView);

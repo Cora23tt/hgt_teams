@@ -1,4 +1,5 @@
 import { newsItems } from "../data/news.js";
+import { COMPONENT_TAGS } from "../config/component-tags.js";
 
 class NewsBoard extends HTMLElement {
   connectedCallback() {
@@ -35,4 +36,4 @@ class NewsBoard extends HTMLElement {
   }
 }
 
-customElements.define("news-board", NewsBoard);
+customElements.define(COMPONENT_TAGS.NEWS_BOARD, NewsBoard);

@@ -1,14 +1,11 @@
-const viewMap = {
-  directory: { label: "Colleagues", component: "directory-view" },
-  attendance: { label: "Attendance", component: "attendance-tools" },
-  news: { label: "Company News", component: "news-board" },
-  profile: { label: "My Profile", component: "profile-insights" }
-};
+import { COMPONENT_TAGS } from "../config/component-tags.js";
+import { APP_EVENTS, dispatchAppEvent } from "../config/events.js";
+import { DEFAULT_VIEW, VIEW_CONFIG, isValidView } from "../config/views.js";
 
 class AppShell extends HTMLElement {
   constructor() {
     super();
-    this.activeView = "directory";
+    this.activeView = DEFAULT_VIEW;
     this.boundHashHandler = () => this.syncViewWithHash();
   }
 
@@ -24,14 +21,14 @@ class AppShell extends HTMLElement {
 
   syncViewWithHash() {
     const hash = window.location.hash.replace("#", "");
-    if (viewMap[hash]) {
+    if (isValidView(hash)) {
       this.activeView = hash;
     }
     window.requestAnimationFrame(() => this.updateActiveView());
   }
 
   render() {
-    const navButtons = Object.entries(viewMap)
+    const navButtons = Object.entries(VIEW_CONFIG)
       .map(
         ([key, value]) => `
           <button class="nav-btn" data-view="${key}">
@@ -67,18 +64,18 @@ class AppShell extends HTMLElement {
     });
 
     this.querySelector("#cta-refresh").addEventListener("click", () => {
-      document.dispatchEvent(new CustomEvent("teams:refresh"));
+      dispatchAppEvent(APP_EVENTS.REFRESH);
     });
 
     this.querySelector("#cta-install").addEventListener("click", () => {
-      document.dispatchEvent(new CustomEvent("teams:install"));
+      dispatchAppEvent(APP_EVENTS.INSTALL);
     });
 
     this.updateActiveView();
   }
 
   setView(viewKey) {
-    if (!viewMap[viewKey]) return;
+    if (!isValidView(viewKey)) return;
     this.activeView = viewKey;
     window.location.hash = viewKey;
     this.updateActiveView();
@@ -89,7 +86,8 @@ class AppShell extends HTMLElement {
     if (!container) return;
 
     container.innerHTML = ``;
-    const current = viewMap[this.activeView];
+    const current = VIEW_CONFIG[this.activeView] || VIEW_CONFIG[DEFAULT_VIEW];
+    if (!current) return;
     const element = document.createElement(current.component);
     container.appendChild(element);
 
@@ -99,4 +97,4 @@ class AppShell extends HTMLElement {
   }
 }
 
-customElements.define("app-shell", AppShell);
+customElements.define(COMPONENT_TAGS.APP_SHELL, AppShell);

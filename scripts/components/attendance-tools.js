@@ -1,3 +1,5 @@
+import { COMPONENT_TAGS } from "../config/component-tags.js";
+
 class AttendanceTools extends HTMLElement {
   constructor() {
     super();
@@ -111,4 +113,4 @@ class AttendanceTools extends HTMLElement {
   }
 }
 
-customElements.define("attendance-tools", AttendanceTools);
+customElements.define(COMPONENT_TAGS.ATTENDANCE_TOOLS, AttendanceTools);

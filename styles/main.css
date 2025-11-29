@@ -235,6 +235,11 @@ dl dd {
   letter-spacing: 0.02em;
 }
 
+.status.unknown {
+  background: color-mix(in srgb, var(--md-subtle) 20%, transparent);
+  color: var(--md-subtle);
+}
+
 .status.on-site {
   background: color-mix(in srgb, var(--md-primary) 35%, transparent);
   color: var(--md-primary);

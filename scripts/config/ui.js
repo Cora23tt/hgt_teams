@@ -1,0 +1,4 @@
+export const UI_TIMING = Object.freeze({
+  TOAST_ACTIVATION_DELAY_MS: 10,
+  TOAST_DISMISS_DELAY_MS: 2500
+});

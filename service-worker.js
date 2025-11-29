@@ -1,24 +1,11 @@
-const CACHE_NAME = "teamshgt-v1";
-const ASSETS = [
-  "/",
-  "/index.html",
-  "/styles/main.css",
-  "/scripts/main.js",
-  "/scripts/components/app-shell.js",
-  "/scripts/components/directory-view.js",
-  "/scripts/components/attendance-tools.js",
-  "/scripts/components/news-board.js",
-  "/scripts/components/profile-insights.js",
-  "/scripts/data/employees.js",
-  "/scripts/data/news.js",
-  "/manifest.json",
-  "/assets/icon-192.png",
-  "/assets/icon-512.png"
-];
+import { PWA_CONFIG } from "./scripts/config/pwa.js";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)).then(() => self.skipWaiting())
+    caches
+      .open(PWA_CONFIG.cacheName)
+      .then((cache) => cache.addAll(PWA_CONFIG.assets))
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -26,7 +13,9 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches
       .keys()
-      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
+      .then((keys) =>
+        Promise.all(keys.filter((key) => key !== PWA_CONFIG.cacheName).map((key) => caches.delete(key)))
+      )
       .then(() => self.clients.claim())
   );
 });
@@ -44,7 +33,7 @@ self.addEventListener("fetch", (event) => {
       }
       return fetch(request).then((response) => {
         const copy = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+        caches.open(PWA_CONFIG.cacheName).then((cache) => cache.put(request, copy));
         return response;
       });
     })
