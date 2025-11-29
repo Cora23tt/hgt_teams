@@ -1,5 +1,6 @@
 import { employees, currentUserId } from "../data/employees.js";
 import { COMPONENT_TAGS } from "../config/component-tags.js";
+import { loadTemplate, fillTemplate } from "../utils/template-loader.js";
 
 const payrollHistory = [
   { month: "Feb", hours: 160, salary: 11800000 },
@@ -7,53 +8,36 @@ const payrollHistory = [
   { month: "Apr", hours: 158, salary: 11900000 }
 ];
 
+const layoutTemplatePromise = loadTemplate(new URL("../templates/profile-insights.html", import.meta.url));
+const payrollRowTemplatePromise = loadTemplate(new URL("../templates/payroll-row.html", import.meta.url));
+
 class ProfileInsights extends HTMLElement {
-  connectedCallback() {
+  async connectedCallback() {
     this.user = employees.find((employee) => employee.id === currentUserId) || employees[0];
-    this.render();
+    await this.render();
   }
 
-  render() {
+  async render() {
     const utilization = Math.round((this.user.hoursThisWeek / this.user.hoursTarget) * 100);
-    this.innerHTML = `
-      <section class="panel">
-        <header class="panel-header">
-          <div>
-            <p class="eyebrow">My dashboard</p>
-            <h2>${this.user.name}</h2>
-            <p class="subtitle">${this.user.role} · ${this.user.department}</p>
-          </div>
-        </header>
-        <div class="split">
-          <div class="card stats-card">
-            <h3>Weekly focus</h3>
-            <p class="value">${this.user.hoursThisWeek}h</p>
-            <p class="meta">Target ${this.user.hoursTarget}h · ${utilization}% of goal</p>
-          </div>
-          <div class="card stats-card">
-            <h3>Estimated salary</h3>
-            <p class="value">${(this.user.salary / 1000000).toFixed(1)}M UZS</p>
-            <p class="meta">Before tax</p>
-          </div>
-        </div>
-        <section class="payroll">
-          <h3>Payroll history</h3>
-          <ul>
-            ${payrollHistory
-              .map(
-                (entry) => `
-                  <li>
-                    <span>${entry.month}</span>
-                    <span>${entry.hours}h</span>
-                    <span>${(entry.salary / 1000000).toFixed(1)}M UZS</span>
-                  </li>
-                `
-              )
-              .join("")}
-          </ul>
-        </section>
-      </section>
-    `;
+    const [layoutTemplate, payrollRowTemplate] = await Promise.all([layoutTemplatePromise, payrollRowTemplatePromise]);
+    const payrollRows = payrollHistory
+      .map((entry) =>
+        fillTemplate(payrollRowTemplate, {
+          MONTH: entry.month,
+          HOURS: `${entry.hours}h`,
+          SALARY: `${(entry.salary / 1000000).toFixed(1)}M UZS`
+        })
+      )
+      .join("");
+
+    this.innerHTML = fillTemplate(layoutTemplate, {
+      USER_NAME: this.user.name,
+      USER_ROLE_DEPARTMENT: `${this.user.role} · ${this.user.department}`,
+      WEEKLY_HOURS: `${this.user.hoursThisWeek}h`,
+      WEEKLY_META: `Target ${this.user.hoursTarget}h · ${utilization}% of goal`,
+      SALARY_ESTIMATE: `${(this.user.salary / 1000000).toFixed(1)}M UZS`,
+      PAYROLL_ROWS: payrollRows
+    });
   }
 }
 

@@ -1,6 +1,10 @@
 import { employees } from "../data/employees.js";
 import { COMPONENT_TAGS } from "../config/component-tags.js";
 import { resolveEmployeeStatus } from "../config/employee.js";
+import { loadTemplate, fillTemplate } from "../utils/template-loader.js";
+
+const layoutTemplatePromise = loadTemplate(new URL("../templates/directory-view.html", import.meta.url));
+const cardTemplatePromise = loadTemplate(new URL("../templates/directory-card.html", import.meta.url));
 
 class DirectoryView extends HTMLElement {
   constructor() {
@@ -8,28 +12,14 @@ class DirectoryView extends HTMLElement {
     this.filtered = [...employees];
   }
 
-  connectedCallback() {
-    this.render();
+  async connectedCallback() {
+    await this.render();
   }
 
-  render() {
-    this.innerHTML = `
-      <section class="panel">
-        <header class="panel-header">
-          <div>
-            <h2>Find a colleague</h2>
-            <p class="subtitle">Live status and contact information in one place</p>
-          </div>
-          <label class="field">
-            <span>Search</span>
-            <input type="search" id="directory-search" placeholder="Name, department or city" />
-          </label>
-        </header>
-        <div class="grid" id="directory-list"></div>
-      </section>
-    `;
+  async render() {
+    this.innerHTML = await layoutTemplatePromise;
 
-    this.querySelector("#directory-search").addEventListener("input", (event) => {
+    this.querySelector("#directory-search").addEventListener("input", async (event) => {
       const value = event.target.value.toLowerCase();
       this.filtered = employees.filter((employee) => {
         return (
@@ -38,48 +28,32 @@ class DirectoryView extends HTMLElement {
           employee.location.toLowerCase().includes(value)
         );
       });
-      this.renderList();
+      await this.renderList();
     });
 
-    this.renderList();
+    await this.renderList();
   }
 
-  renderList() {
+  async renderList() {
     const list = this.querySelector("#directory-list");
     if (!list) return;
 
+    const template = await cardTemplatePromise;
     list.innerHTML = this.filtered
       .map(
         (employee) => {
           const statusMeta = resolveEmployeeStatus(employee.status);
-          return `
-          <article class="card">
-            <header>
-              <div>
-                <p class="eyebrow">${employee.department}</p>
-                <h3>${employee.name}</h3>
-                <p>${employee.role}</p>
-              </div>
-              <span class="status ${statusMeta.id}" aria-label="${statusMeta.label}">
-                ${statusMeta.label}
-              </span>
-            </header>
-            <dl>
-              <div>
-                <dt>Phone</dt>
-                <dd><a href="tel:${employee.phone.replace(/\s/g, "")}">${employee.phone}</a></dd>
-              </div>
-              <div>
-                <dt>Email</dt>
-                <dd><a href="mailto:${employee.email}">${employee.email}</a></dd>
-              </div>
-              <div>
-                <dt>Location</dt>
-                <dd>${employee.location}</dd>
-              </div>
-            </dl>
-          </article>
-        `;
+          return fillTemplate(template, {
+            DEPARTMENT: employee.department,
+            NAME: employee.name,
+            ROLE: employee.role,
+            STATUS_CLASS: statusMeta.id,
+            STATUS_LABEL: statusMeta.label,
+            PHONE_LINK: employee.phone.replace(/\s/g, ""),
+            PHONE: employee.phone,
+            EMAIL: employee.email,
+            LOCATION: employee.location
+          });
         }
       )
       .join("");

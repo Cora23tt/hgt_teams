@@ -1,38 +1,29 @@
 import { newsItems } from "../data/news.js";
 import { COMPONENT_TAGS } from "../config/component-tags.js";
+import { loadTemplate, fillTemplate } from "../utils/template-loader.js";
+
+const layoutTemplatePromise = loadTemplate(new URL("../templates/news-board.html", import.meta.url));
+const itemTemplatePromise = loadTemplate(new URL("../templates/news-item.html", import.meta.url));
 
 class NewsBoard extends HTMLElement {
-  connectedCallback() {
-    this.render();
+  async connectedCallback() {
+    await this.render();
   }
 
-  render() {
-    this.innerHTML = `
-      <section class="panel">
-        <header class="panel-header">
-          <div>
-            <h2>HGT Pulse</h2>
-            <p class="subtitle">Company announcements and blog posts</p>
-          </div>
-        </header>
-        <div class="stack">
-          ${newsItems
-            .map(
-              (item) => `
-                <article class="card news-card">
-                  <header>
-                    <p class="eyebrow">${new Date(item.date).toLocaleDateString()}</p>
-                    <h3>${item.title}</h3>
-                  </header>
-                  <p>${item.summary}</p>
-                  <footer class="meta">By ${item.author}</footer>
-                </article>
-              `
-            )
-            .join("")}
-        </div>
-      </section>
-    `;
+  async render() {
+    const [layoutTemplate, itemTemplate] = await Promise.all([layoutTemplatePromise, itemTemplatePromise]);
+    const listMarkup = newsItems
+      .map((item) =>
+        fillTemplate(itemTemplate, {
+          DATE: new Date(item.date).toLocaleDateString(),
+          TITLE: item.title,
+          SUMMARY: item.summary,
+          AUTHOR: item.author
+        })
+      )
+      .join("");
+
+    this.innerHTML = fillTemplate(layoutTemplate, { NEWS_ITEMS: listMarkup });
   }
 }
 
