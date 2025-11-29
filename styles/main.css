@@ -77,7 +77,7 @@ app-shell {
   justify-content: space-between;
   gap: 1.5rem;
   flex-wrap: wrap;
-  color: var(--md-on-bright);
+  color: var(--md-text);
   box-shadow: 0 35px 55px rgba(5, 10, 8, 0.55);
 }
 
@@ -106,8 +106,8 @@ h4 {
 }
 
 .app-header .subtitle {
-  color: color-mix(in srgb, var(--md-on-bright) 80%, transparent);
-}
+  color: color-mix(in srgb, var(--md-text) 80%, transparent);
+} 
 
 .app-nav {
   display: grid;
