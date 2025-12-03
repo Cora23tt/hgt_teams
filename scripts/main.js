@@ -6,6 +6,9 @@ import "./components/profile-insights.js";
 import { APP_EVENTS } from "./config/events.js";
 import { PWA_CONFIG } from "./config/pwa.js";
 import { UI_TIMING } from "./config/ui.js";
+import { getCurrentLanguage, t } from "./utils/i18n.js";
+
+document.documentElement.setAttribute("lang", getCurrentLanguage());
 
 let deferredPrompt;
 
@@ -23,7 +26,7 @@ function registerPWA() {
 
   document.addEventListener(APP_EVENTS.INSTALL, async () => {
     if (!deferredPrompt) {
-      alert("App install prompt is not ready yet. Try again soon.");
+      alert(t("app.installNotReady"));
       return;
     }
     deferredPrompt.prompt();
@@ -38,7 +41,7 @@ function wireRefresh() {
   document.addEventListener(APP_EVENTS.REFRESH, () => {
     const toast = document.createElement("div");
     toast.className = "toast";
-    toast.textContent = "Data synced just now";
+    toast.textContent = t("app.refreshToast");
     document.body.appendChild(toast);
     setTimeout(() => {
       toast.classList.add("visible");

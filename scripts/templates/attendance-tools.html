@@ -1,43 +1,43 @@
 <section class="panel">
   <header class="panel-header">
     <div>
-      <h2>Attendance Center</h2>
-      <p class="subtitle">Notify supervisors about schedule changes or planned leave</p>
+      <h2>{{TITLE}}</h2>
+      <p class="subtitle">{{SUBTITLE}}</p>
     </div>
   </header>
   <div class="split">
     <form id="late-form" class="card form-card">
-      <h3>Running late</h3>
+      <h3>{{RUNNING_LATE}}</h3>
       <label class="field">
-        <span>Reason</span>
-        <input name="reason" required placeholder="Traffic, customer visit…" />
+        <span>{{REASON_LABEL}}</span>
+        <input name="reason" required placeholder="{{REASON_PLACEHOLDER}}" />
       </label>
       <label class="field">
-        <span>Expected arrival</span>
+        <span>{{EXPECTED_ARRIVAL}}</span>
         <input name="eta" type="time" required />
       </label>
-      <button class="primary">Send Alert</button>
+      <button class="primary">{{SEND_ALERT}}</button>
     </form>
     <form id="holiday-form" class="card form-card">
-      <h3>Request holiday</h3>
+      <h3>{{REQUEST_HOLIDAY}}</h3>
       <label class="field">
-        <span>Start date</span>
+        <span>{{START_DATE}}</span>
         <input type="date" name="from" required />
       </label>
       <label class="field">
-        <span>End date</span>
+        <span>{{END_DATE}}</span>
         <input type="date" name="to" required />
       </label>
       <label class="field">
-        <span>Notes</span>
-        <textarea name="notes" rows="3" placeholder="Optional context"></textarea>
+        <span>{{NOTES}}</span>
+        <textarea name="notes" rows="3" placeholder="{{NOTES_PLACEHOLDER}}"></textarea>
       </label>
-      <button class="primary">Submit Request</button>
+      <button class="primary">{{SUBMIT_REQUEST}}</button>
     </form>
   </div>
   <section class="timeline" id="activity-feed">
-    <h3>Recent activity</h3>
-    <p class="subtitle">Updates stay visible to HR until cleared</p>
+    <h3>{{RECENT_ACTIVITY}}</h3>
+    <p class="subtitle">{{RECENT_ACTIVITY_SUBTITLE}}</p>
     <ul></ul>
   </section>
 </section>

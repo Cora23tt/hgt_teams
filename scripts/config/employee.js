@@ -1,8 +1,10 @@
+import { t } from "../utils/i18n.js";
+
 export const EMPLOYEE_STATUSES = Object.freeze({
-  ON_SITE: { id: "on-site", label: "On-site" },
-  REMOTE: { id: "remote", label: "Remote" },
-  IN_TRANSIT: { id: "in-transit", label: "In Transit" },
-  ON_LEAVE: { id: "on-leave", label: "On Leave" }
+  ON_SITE: { id: "on-site", labelKey: "employee.status.onSite" },
+  REMOTE: { id: "remote", labelKey: "employee.status.remote" },
+  IN_TRANSIT: { id: "in-transit", labelKey: "employee.status.inTransit" },
+  ON_LEAVE: { id: "on-leave", labelKey: "employee.status.onLeave" }
 });
 
 Object.values(EMPLOYEE_STATUSES).forEach((status) => Object.freeze(status));
@@ -57,10 +59,14 @@ export function createEmployee(data) {
 
 export function resolveEmployeeStatus(statusId) {
   if (EMPLOYEE_STATUS_BY_ID[statusId]) {
-    return EMPLOYEE_STATUS_BY_ID[statusId];
+    const baseStatus = EMPLOYEE_STATUS_BY_ID[statusId];
+    return {
+      ...baseStatus,
+      label: t(baseStatus.labelKey)
+    };
   }
   const normalized = (statusId || "unknown").toString().trim().toLowerCase().replace(/\s+/g, "-");
   const fallbackId = normalized || "unknown";
-  const fallbackLabel = statusId || "Unknown";
+  const fallbackLabel = statusId || t("employee.status.unknown");
   return { id: fallbackId, label: fallbackLabel };
 }

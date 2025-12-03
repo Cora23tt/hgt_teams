@@ -1,7 +1,8 @@
 import { COMPONENT_TAGS } from "../config/component-tags.js";
 import { APP_EVENTS, dispatchAppEvent } from "../config/events.js";
-import { DEFAULT_VIEW, VIEW_CONFIG, isValidView } from "../config/views.js";
+import { DEFAULT_VIEW, VIEW_CONFIG, isValidView, getViewLabel } from "../config/views.js";
 import { loadTemplate, fillTemplate } from "../utils/template-loader.js";
+import { t } from "../utils/i18n.js";
 
 const shellTemplatePromise = loadTemplate(new URL("../templates/app-shell.html", import.meta.url));
 const navButtonTemplatePromise = loadTemplate(new URL("../templates/app-shell-nav-button.html", import.meta.url));
@@ -35,10 +36,15 @@ class AppShell extends HTMLElement {
     const [template, navButtonTemplate] = await Promise.all([shellTemplatePromise, navButtonTemplatePromise]);
 
     const navButtons = Object.entries(VIEW_CONFIG)
-      .map(([key, value]) => fillTemplate(navButtonTemplate, { VIEW_KEY: key, VIEW_LABEL: value.label }))
+      .map(([key]) => fillTemplate(navButtonTemplate, { VIEW_KEY: key, VIEW_LABEL: getViewLabel(key) }))
       .join("");
 
-    this.innerHTML = fillTemplate(template, { NAV_BUTTONS: navButtons });
+    this.innerHTML = fillTemplate(template, {
+      NAV_BUTTONS: navButtons,
+      SUBTITLE: t("app.subtitle"),
+      CTA_INSTALL: t("app.installCta"),
+      CTA_REFRESH: t("app.refreshCta")
+    });
 
     this.querySelectorAll(".nav-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
